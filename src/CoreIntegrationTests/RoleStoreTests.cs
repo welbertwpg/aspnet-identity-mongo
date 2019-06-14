@@ -2,23 +2,25 @@
 {
 	using System.Linq;
 	using System.Threading.Tasks;
-	using Microsoft.AspNetCore.Identity.MongoDB;
+	using MongoDB.Identity;
 	using MongoDB.Bson;
 	using NUnit.Framework;
+    using MongoDB.Driver;
+    using static NUnit.StaticExpect.Expectations;
 
-	[TestFixture]
+    [TestFixture]
 	public class RoleStoreTests : UserIntegrationTestsBase
 	{
 		[Test]
 		public async Task Create_NewRole_Saves()
 		{
 			var roleName = "admin";
-			var role = new IdentityRole(roleName);
+			var role = new MongoIdentityRole(roleName);
 			var manager = GetRoleManager();
 
 			await manager.CreateAsync(role);
 
-			var savedRole = Roles.FindAll().Single();
+			var savedRole = Roles.Find(FilterDefinition<MongoIdentityRole>.Empty).Single();
 			Expect(savedRole.Name, Is.EqualTo(roleName));
 			Expect(savedRole.NormalizedName, Is.EqualTo("ADMIN"));
 		}
@@ -27,7 +29,7 @@
 		public async Task FindByName_SavedRole_ReturnsRole()
 		{
 			var roleName = "name";
-			var role = new IdentityRole {Name = roleName};
+			var role = new MongoIdentityRole {Name = roleName};
 			var manager = GetRoleManager();
 			await manager.CreateAsync(role);
 
@@ -42,7 +44,7 @@
 		public async Task FindById_SavedRole_ReturnsRole()
 		{
 			var roleId = ObjectId.GenerateNewId().ToString();
-			var role = new IdentityRole {Name = "name"};
+			var role = new MongoIdentityRole {Name = "name"};
 			role.Id = roleId;
 			var manager = GetRoleManager();
 			await manager.CreateAsync(role);
@@ -56,20 +58,20 @@
 		[Test]
 		public async Task Delete_ExistingRole_Removes()
 		{
-			var role = new IdentityRole {Name = "name"};
+			var role = new MongoIdentityRole {Name = "name"};
 			var manager = GetRoleManager();
 			await manager.CreateAsync(role);
-			Expect(Roles.FindAll(), Is.Not.Empty);
+			Expect(Roles.Find(FilterDefinition<MongoIdentityRole>.Empty), Is.Not.Empty);
 
 			await manager.DeleteAsync(role);
 
-			Expect(Roles.FindAll(), Is.Empty);
+			Expect(Roles.Find(FilterDefinition<MongoIdentityRole>.Empty), Is.Empty);
 		}
 
 		[Test]
 		public async Task Update_ExistingRole_Updates()
 		{
-			var role = new IdentityRole {Name = "name"};
+			var role = new MongoIdentityRole {Name = "name"};
 			var manager = GetRoleManager();
 			await manager.CreateAsync(role);
 			var savedRole = await manager.FindByIdAsync(role.Id);
@@ -77,7 +79,7 @@
 
 			await manager.UpdateAsync(savedRole);
 
-			var changedRole = Roles.FindAll().Single();
+			var changedRole = Roles.Find(FilterDefinition<MongoIdentityRole>.Empty).Single();
 			Expect(changedRole, Is.Not.Null);
 			Expect(changedRole.Name, Is.EqualTo("newname"));
 		}
@@ -85,7 +87,7 @@
 		[Test]
 		public async Task SimpleAccessorsAndGetters()
 		{
-			var role = new IdentityRole
+			var role = new MongoIdentityRole
 			{
 				Name = "name"
 			};

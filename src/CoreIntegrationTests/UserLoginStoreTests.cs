@@ -3,11 +3,13 @@
 	using System.Linq;
 	using System.Threading.Tasks;
 	using Microsoft.AspNetCore.Identity;
-	using Microsoft.AspNetCore.Identity.MongoDB;
+    using MongoDB.Driver;
+    using MongoDB.Identity;
 	using NUnit.Framework;
+    using static NUnit.StaticExpect.Expectations;
 
-	// todo low - validate all tests work
-	[TestFixture]
+    // todo low - validate all tests work
+    [TestFixture]
 	public class UserLoginStoreTests : UserIntegrationTestsBase
 	{
 		[Test]
@@ -15,12 +17,12 @@
 		{
 			var manager = GetUserManager();
 			var login = new UserLoginInfo("provider", "key", "name");
-			var user = new IdentityUser {UserName = "bob"};
+			var user = new MongoIdentityUser {UserName = "bob"};
 			await manager.CreateAsync(user);
 
 			await manager.AddLoginAsync(user, login);
 
-			var savedLogin = Users.FindAll().Single().Logins.Single();
+			var savedLogin = Users.Find(FilterDefinition<MongoIdentityUser>.Empty).Single().Logins.Single();
 			Expect(savedLogin.LoginProvider, Is.EqualTo("provider"));
 			Expect(savedLogin.ProviderKey, Is.EqualTo("key"));
 			Expect(savedLogin.ProviderDisplayName, Is.EqualTo("name"));
@@ -31,13 +33,13 @@
 		{
 			var manager = GetUserManager();
 			var login = new UserLoginInfo("provider", "key", "name");
-			var user = new IdentityUser {UserName = "bob"};
+			var user = new MongoIdentityUser {UserName = "bob"};
 			await manager.CreateAsync(user);
 			await manager.AddLoginAsync(user, login);
 
 			await manager.RemoveLoginAsync(user, login.LoginProvider, login.ProviderKey);
 
-			var savedUser = Users.FindAll().Single();
+			var savedUser = Users.Find(FilterDefinition<MongoIdentityUser>.Empty).Single();
 			Expect(savedUser.Logins, Is.Empty);
 		}
 
@@ -46,7 +48,7 @@
 		{
 			var manager = GetUserManager();
 			var login = new UserLoginInfo("provider", "key", "name");
-			var user = new IdentityUser {UserName = "bob"};
+			var user = new MongoIdentityUser {UserName = "bob"};
 			await manager.CreateAsync(user);
 			await manager.AddLoginAsync(user, login);
 
@@ -63,7 +65,7 @@
 		{
 			var manager = GetUserManager();
 			var login = new UserLoginInfo("provider", "key", "name");
-			var user = new IdentityUser {UserName = "bob"};
+			var user = new MongoIdentityUser {UserName = "bob"};
 			await manager.CreateAsync(user);
 			await manager.AddLoginAsync(user, login);
 
@@ -77,7 +79,7 @@
 		{
 			var manager = GetUserManager();
 			var login = new UserLoginInfo("provider", "key", "name");
-			var user = new IdentityUser {UserName = "bob"};
+			var user = new MongoIdentityUser {UserName = "bob"};
 			await manager.CreateAsync(user);
 			await manager.AddLoginAsync(user, login);
 
@@ -91,7 +93,7 @@
 		{
 			var manager = GetUserManager();
 			var login = new UserLoginInfo("provider", "key", "name");
-			var user = new IdentityUser {UserName = "bob"};
+			var user = new MongoIdentityUser {UserName = "bob"};
 			await manager.CreateAsync(user);
 			await manager.AddLoginAsync(user, login);
 

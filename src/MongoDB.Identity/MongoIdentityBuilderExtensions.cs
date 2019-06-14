@@ -4,7 +4,7 @@ namespace Microsoft.Extensions.DependencyInjection
 {
 	using System;
 	using AspNetCore.Identity;
-	using AspNetCore.Identity.MongoDB;
+	using MongoDB.Identity;
 	using MongoDB.Driver;
 
 	public static class MongoIdentityBuilderExtensions
@@ -16,8 +16,8 @@ namespace Microsoft.Extensions.DependencyInjection
 		/// <param name="builder"></param>
 		/// <param name="connectionString">Must contain the database name</param>
 		public static IdentityBuilder RegisterMongoStores<TUser, TRole>(this IdentityBuilder builder, string connectionString)
-			where TRole : IdentityRole
-			where TUser : IdentityUser
+			where TRole : MongoIdentityRole
+			where TUser : MongoIdentityUser
 		{
 			var url = new MongoUrl(connectionString);
 			var client = new MongoClient(url);
@@ -43,8 +43,8 @@ namespace Microsoft.Extensions.DependencyInjection
 		public static IdentityBuilder RegisterMongoStores<TUser, TRole>(this IdentityBuilder builder,
 			Func<IServiceProvider, IMongoCollection<TUser>> usersCollectionFactory,
 			Func<IServiceProvider, IMongoCollection<TRole>> rolesCollectionFactory)
-			where TRole : IdentityRole
-			where TUser : IdentityUser
+			where TRole : MongoIdentityRole
+			where TUser : MongoIdentityUser
 		{
 			if (typeof(TUser) != builder.UserType)
 			{
@@ -60,8 +60,8 @@ namespace Microsoft.Extensions.DependencyInjection
 				              + "these do not match.";
 				throw new ArgumentException(message);
 			}
-			builder.Services.AddSingleton<IUserStore<TUser>>(p => new UserStore<TUser>(usersCollectionFactory(p)));
-			builder.Services.AddSingleton<IRoleStore<TRole>>(p => new RoleStore<TRole>(rolesCollectionFactory(p)));
+			builder.Services.AddSingleton<IUserStore<TUser>>(p => new MongoUserStore<TUser>(usersCollectionFactory(p)));
+			builder.Services.AddSingleton<IRoleStore<TRole>>(p => new MongoRoleStore<TRole>(rolesCollectionFactory(p)));
 			return builder;
 		}
 
@@ -72,7 +72,7 @@ namespace Microsoft.Extensions.DependencyInjection
 		/// <param name="connectionString">Connection string must contain the database name</param>
 		public static IdentityBuilder AddIdentityWithMongoStores(this IServiceCollection services, string connectionString)
 		{
-			return services.AddIdentityWithMongoStoresUsingCustomTypes<IdentityUser, IdentityRole>(connectionString);
+			return services.AddIdentityWithMongoStoresUsingCustomTypes<MongoIdentityUser, MongoIdentityRole>(connectionString);
 		}
 
 		/// <summary>
@@ -84,8 +84,8 @@ namespace Microsoft.Extensions.DependencyInjection
 		/// <param name="services"></param>
 		/// <param name="connectionString">Connection string must contain the database name</param>
 		public static IdentityBuilder AddIdentityWithMongoStoresUsingCustomTypes<TUser, TRole>(this IServiceCollection services, string connectionString)
-			where TUser : IdentityUser
-			where TRole : IdentityRole
+			where TUser : MongoIdentityUser
+			where TRole : MongoIdentityRole
 		{
 			return services.AddIdentity<TUser, TRole>()
 				.RegisterMongoStores<TUser, TRole>(connectionString);

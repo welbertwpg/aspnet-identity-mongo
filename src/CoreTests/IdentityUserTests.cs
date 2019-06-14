@@ -1,17 +1,18 @@
 ﻿namespace Tests
 {
-	using Microsoft.AspNetCore.Identity.MongoDB;
+	using MongoDB.Identity;
 	using MongoDB.Bson;
 	using NUnit.Framework;
+    using static NUnit.StaticExpect.Expectations;
 
-	// todo low - validate all tests work
-	[TestFixture]
-	public class IdentityUserTests : AssertionHelper
+    // todo low - validate all tests work
+    [TestFixture]
+	public class IdentityUserTests
 	{
 		[Test]
 		public void ToBsonDocument_IdAssigned_MapsToBsonObjectId()
 		{
-			var user = new IdentityUser();
+			var user = new MongoIdentityUser();
 
 			var document = user.ToBsonDocument();
 
@@ -21,7 +22,7 @@
 		[Test]
 		public void Create_NewIdentityUser_HasIdAssigned()
 		{
-			var user = new IdentityUser();
+			var user = new MongoIdentityUser();
 
 			var parsed = user.Id.SafeParseObjectId();
 			Expect(parsed, Is.Not.Null);
@@ -33,7 +34,7 @@
 		{
 			// if a particular consuming application doesn't intend to use passwords, there's no reason to store a null entry except for padding concerns, if that is the case then the consumer may want to create a custom class map to serialize as desired.
 
-			var user = new IdentityUser();
+			var user = new MongoIdentityUser();
 
 			var document = user.ToBsonDocument();
 
@@ -44,7 +45,7 @@
 		public void Create_NullLists_DoesNotSerializeNullLists()
 		{
 			// serialized nulls can cause havoc in deserialization, overwriting the constructor's initial empty list 
-			var user = new IdentityUser();
+			var user = new MongoIdentityUser();
 			user.Roles = null;
 			user.Tokens = null;
 			user.Logins = null;
@@ -61,7 +62,7 @@
 		[Test]
 		public void Create_NewIdentityUser_ListsNotNull()
 		{
-			var user = new IdentityUser();
+			var user = new MongoIdentityUser();
 
 			Expect(user.Logins, Is.Empty);
 			Expect(user.Tokens, Is.Empty);

@@ -2,24 +2,26 @@
 {
 	using System.Linq;
 	using System.Threading.Tasks;
-	using Microsoft.AspNetCore.Identity.MongoDB;
+	using MongoDB.Identity;
 	using MongoDB.Bson;
 	using NUnit.Framework;
+    using MongoDB.Driver;
+    using static NUnit.StaticExpect.Expectations;
 
-	// todo low - validate all tests work
-	[TestFixture]
+    // todo low - validate all tests work
+    [TestFixture]
 	public class UserStoreTests : UserIntegrationTestsBase
 	{
 		[Test]
 		public async Task Create_NewUser_Saves()
 		{
 			var userName = "name";
-			var user = new IdentityUser {UserName = userName};
+			var user = new MongoIdentityUser {UserName = userName};
 			var manager = GetUserManager();
 
 			await manager.CreateAsync(user);
 
-			var savedUser = Users.FindAll().Single();
+			var savedUser = Users.Find(FilterDefinition<MongoIdentityUser>.Empty).Single();
 			Expect(savedUser.UserName, Is.EqualTo(user.UserName));
 		}
 
@@ -27,7 +29,7 @@
 		public async Task FindByName_SavedUser_ReturnsUser()
 		{
 			var userName = "name";
-			var user = new IdentityUser {UserName = userName};
+			var user = new MongoIdentityUser {UserName = userName};
 			var manager = GetUserManager();
 			await manager.CreateAsync(user);
 
@@ -51,7 +53,7 @@
 		public async Task FindById_SavedUser_ReturnsUser()
 		{
 			var userId = ObjectId.GenerateNewId().ToString();
-			var user = new IdentityUser {UserName = "name"};
+			var user = new MongoIdentityUser {UserName = "name"};
 			user.Id = userId;
 			var manager = GetUserManager();
 			await manager.CreateAsync(user);
@@ -85,20 +87,20 @@
 		[Test]
 		public async Task Delete_ExistingUser_Removes()
 		{
-			var user = new IdentityUser {UserName = "name"};
+			var user = new MongoIdentityUser {UserName = "name"};
 			var manager = GetUserManager();
 			await manager.CreateAsync(user);
-			Expect(Users.FindAll(), Is.Not.Empty);
+			Expect(Users.Find(FilterDefinition<MongoIdentityUser>.Empty), Is.Not.Empty);
 
 			await manager.DeleteAsync(user);
 
-			Expect(Users.FindAll(), Is.Empty);
+			Expect(Users.Find(FilterDefinition<MongoIdentityUser>.Empty), Is.Empty);
 		}
 
 		[Test]
 		public async Task Update_ExistingUser_Updates()
 		{
-			var user = new IdentityUser {UserName = "name"};
+			var user = new MongoIdentityUser {UserName = "name"};
 			var manager = GetUserManager();
 			await manager.CreateAsync(user);
 			var savedUser = await manager.FindByIdAsync(user.Id);
@@ -106,7 +108,7 @@
 
 			await manager.UpdateAsync(savedUser);
 
-			var changedUser = Users.FindAll().Single();
+			var changedUser = Users.Find(FilterDefinition<MongoIdentityUser>.Empty).Single();
 			Expect(changedUser, Is.Not.Null);
 			Expect(changedUser.UserName, Is.EqualTo("newname"));
 		}
@@ -114,7 +116,7 @@
 		[Test]
 		public async Task SimpleAccessorsAndGetters()
 		{
-			var user = new IdentityUser
+			var user = new MongoIdentityUser
 			{
 				UserName = "username"
 			};

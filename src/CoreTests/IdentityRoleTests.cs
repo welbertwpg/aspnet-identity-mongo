@@ -1,17 +1,18 @@
 ﻿namespace Tests
 {
-	using Microsoft.AspNetCore.Identity.MongoDB;
+	using MongoDB.Identity;
 	using MongoDB.Bson;
 	using NUnit.Framework;
+    using static NUnit.StaticExpect.Expectations;
 
-	// todo low - validate all tests work
-	[TestFixture]
-	public class IdentityRoleTests : AssertionHelper
+    // todo low - validate all tests work
+    [TestFixture]
+	public class IdentityRoleTests
 	{
 		[Test]
 		public void ToBsonDocument_IdAssigned_MapsToBsonObjectId()
 		{
-			var role = new IdentityRole();
+			var role = new MongoIdentityRole();
 
 			var document = role.ToBsonDocument();
 
@@ -21,7 +22,7 @@
 		[Test]
 		public void Create_WithoutRoleName_HasIdAssigned()
 		{
-			var role = new IdentityRole();
+			var role = new MongoIdentityRole();
 
 			var parsed = role.Id.SafeParseObjectId();
 			Expect(parsed, Is.Not.Null);
@@ -33,7 +34,7 @@
 		{
 			var name = "admin";
 
-			var role = new IdentityRole(name);
+			var role = new MongoIdentityRole(name);
 
 			Expect(role.Name, Is.EqualTo(name));
 		}
@@ -41,7 +42,7 @@
 		[Test]
 		public void Create_WithRoleName_SetsId()
 		{
-			var role = new IdentityRole("admin");
+			var role = new MongoIdentityRole("admin");
 
 			var parsed = role.Id.SafeParseObjectId();
 			Expect(parsed, Is.Not.Null);

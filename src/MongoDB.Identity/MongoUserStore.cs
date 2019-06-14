@@ -2,7 +2,7 @@
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 // I'm using async methods to leverage implicit Task wrapping of results from expression bodied functions.
 
-namespace Microsoft.AspNetCore.Identity.MongoDB
+namespace MongoDB.Identity
 {
 	using System;
 	using System.Collections.Generic;
@@ -10,14 +10,15 @@ namespace Microsoft.AspNetCore.Identity.MongoDB
 	using System.Security.Claims;
 	using System.Threading;
 	using System.Threading.Tasks;
-	using global::MongoDB.Bson;
-	using global::MongoDB.Driver;
+	using MongoDB.Bson;
+	using MongoDB.Driver;
+    using Microsoft.AspNetCore.Identity;
 
-	/// <summary>
-	///     When passing a cancellation token, it will only be used if the operation requires a database interaction.
-	/// </summary>
-	/// <typeparam name="TUser"></typeparam>
-	public class UserStore<TUser> :
+    /// <summary>
+    ///     When passing a cancellation token, it will only be used if the operation requires a database interaction.
+    /// </summary>
+    /// <typeparam name="TUser"></typeparam>
+    public class MongoUserStore<TUser> :
 			IUserPasswordStore<TUser>,
 			IUserRoleStore<TUser>,
 			IUserLoginStore<TUser>,
@@ -29,11 +30,11 @@ namespace Microsoft.AspNetCore.Identity.MongoDB
 			IUserLockoutStore<TUser>,
 			IQueryableUserStore<TUser>,
 			IUserAuthenticationTokenStore<TUser>
-		where TUser : IdentityUser
+		where TUser : MongoIdentityUser
 	{
 		private readonly IMongoCollection<TUser> _Users;
 
-		public UserStore(IMongoCollection<TUser> users)
+		public MongoUserStore(IMongoCollection<TUser> users)
 		{
 			_Users = users;
 		}

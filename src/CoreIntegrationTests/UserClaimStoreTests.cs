@@ -3,17 +3,18 @@
 	using System.Linq;
 	using System.Security.Claims;
 	using System.Threading.Tasks;
-	using Microsoft.AspNetCore.Identity.MongoDB;
+	using MongoDB.Identity;
 	using NUnit.Framework;
 	using Tests;
+    using static NUnit.StaticExpect.Expectations;
 
-	[TestFixture]
+    [TestFixture]
 	public class UserClaimStoreTests : UserIntegrationTestsBase
 	{
 		[Test]
 		public async Task Create_NewUser_HasNoClaims()
 		{
-			var user = new IdentityUser {UserName = "bob"};
+			var user = new MongoIdentityUser {UserName = "bob"};
 			var manager = GetUserManager();
 			await manager.CreateAsync(user);
 
@@ -25,7 +26,7 @@
 		[Test]
 		public async Task AddClaim_ReturnsClaim()
 		{
-			var user = new IdentityUser {UserName = "bob"};
+			var user = new MongoIdentityUser {UserName = "bob"};
 			var manager = GetUserManager();
 			await manager.CreateAsync(user);
 
@@ -39,7 +40,7 @@
 		[Test]
 		public async Task RemoveClaim_RemovesExistingClaim()
 		{
-			var user = new IdentityUser {UserName = "bob"};
+			var user = new MongoIdentityUser {UserName = "bob"};
 			var manager = GetUserManager();
 			await manager.CreateAsync(user);
 			await manager.AddClaimAsync(user, new Claim("type", "value"));
@@ -52,7 +53,7 @@
 		[Test]
 		public async Task RemoveClaim_DifferentType_DoesNotRemoveClaim()
 		{
-			var user = new IdentityUser {UserName = "bob"};
+			var user = new MongoIdentityUser {UserName = "bob"};
 			var manager = GetUserManager();
 			await manager.CreateAsync(user);
 			await manager.AddClaimAsync(user, new Claim("type", "value"));
@@ -65,7 +66,7 @@
 		[Test]
 		public async Task RemoveClaim_DifferentValue_DoesNotRemoveClaim()
 		{
-			var user = new IdentityUser {UserName = "bob"};
+			var user = new MongoIdentityUser {UserName = "bob"};
 			var manager = GetUserManager();
 			await manager.CreateAsync(user);
 			await manager.AddClaimAsync(user, new Claim("type", "value"));
@@ -78,8 +79,8 @@
 		[Test]
 		public async Task ReplaceClaim_Replaces()
 		{
-			// note: unit tests cover behavior of ReplaceClaim method on IdentityUser
-			var user = new IdentityUser {UserName = "bob"};
+			// note: unit tests cover behavior of ReplaceClaim method on MongoIdentityUser
+			var user = new MongoIdentityUser {UserName = "bob"};
 			var manager = GetUserManager();
 			await manager.CreateAsync(user);
 			var existingClaim = new Claim("type", "value");
@@ -94,11 +95,11 @@
 		[Test]
 		public async Task GetUsersForClaim()
 		{
-			var userWithClaim = new IdentityUser
+			var userWithClaim = new MongoIdentityUser
 			{
 				UserName = "with"
 			};
-			var userWithout = new IdentityUser();
+			var userWithout = new MongoIdentityUser();
 			var manager = GetUserManager();
 			await manager.CreateAsync(userWithClaim);
 			await manager.CreateAsync(userWithout);

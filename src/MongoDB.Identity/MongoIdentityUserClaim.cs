@@ -1,17 +1,17 @@
-﻿namespace Microsoft.AspNetCore.Identity.MongoDB
+﻿namespace MongoDB.Identity
 {
 	using System.Security.Claims;
 
 	/// <summary>
 	/// A claim that a user possesses.
 	/// </summary>
-	public class IdentityUserClaim
+	public class MongoIdentityUserClaim
 	{
-		public IdentityUserClaim()
+		public MongoIdentityUserClaim()
 		{
 		}
 
-		public IdentityUserClaim(Claim claim)
+		public MongoIdentityUserClaim(Claim claim)
 		{
 			Type = claim.Type;
 			Value = claim.Value;

@@ -2,21 +2,23 @@
 {
 	using System.Linq;
 	using System.Threading.Tasks;
-	using Microsoft.AspNetCore.Identity.MongoDB;
+    using MongoDB.Driver;
+    using MongoDB.Identity;
 	using NUnit.Framework;
+    using static NUnit.StaticExpect.Expectations;
 
-	[TestFixture]
+    [TestFixture]
 	public class UserSecurityStampStoreTests : UserIntegrationTestsBase
 	{
 		[Test]
 		public async Task Create_NewUser_HasSecurityStamp()
 		{
 			var manager = GetUserManager();
-			var user = new IdentityUser {UserName = "bob"};
+			var user = new MongoIdentityUser {UserName = "bob"};
 
 			await manager.CreateAsync(user);
 
-			var savedUser = Users.FindAll().Single();
+			var savedUser = Users.Find(FilterDefinition<MongoIdentityUser>.Empty).Single();
 			Expect(savedUser.SecurityStamp, Is.Not.Null);
 		}
 
@@ -24,7 +26,7 @@
 		public async Task GetSecurityStamp_NewUser_ReturnsStamp()
 		{
 			var manager = GetUserManager();
-			var user = new IdentityUser {UserName = "bob"};
+			var user = new MongoIdentityUser {UserName = "bob"};
 			await manager.CreateAsync(user);
 
 			var stamp = await manager.GetSecurityStampAsync(user);

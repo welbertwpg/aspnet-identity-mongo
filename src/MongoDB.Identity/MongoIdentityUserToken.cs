@@ -1,9 +1,9 @@
-﻿namespace Microsoft.AspNetCore.Identity.MongoDB
+﻿namespace MongoDB.Identity
 {
 	/// <summary>
 	///     Authentication token associated with a user
 	/// </summary>
-	public class IdentityUserToken
+	public class MongoIdentityUserToken
 	{
 		/// <summary>
 		/// The provider that the token came from.

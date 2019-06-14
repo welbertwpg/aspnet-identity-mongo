@@ -1,17 +1,18 @@
 ﻿namespace IntegrationTests
 {
 	using System.Threading.Tasks;
-	using Microsoft.AspNetCore.Identity.MongoDB;
+	using MongoDB.Identity;
 	using NUnit.Framework;
+    using static NUnit.StaticExpect.Expectations;
 
-	// todo low - validate all tests work
-	[TestFixture]
+    // todo low - validate all tests work
+    [TestFixture]
 	public class UserTwoFactorStoreTests : UserIntegrationTestsBase
 	{
 		[Test]
 		public async Task SetTwoFactorEnabled()
 		{
-			var user = new IdentityUser {UserName = "bob"};
+			var user = new MongoIdentityUser {UserName = "bob"};
 			var manager = GetUserManager();
 			await manager.CreateAsync(user);
 
@@ -23,7 +24,7 @@
 		[Test]
 		public async Task ClearTwoFactorEnabled_PreviouslyEnabled_NotEnabled()
 		{
-			var user = new IdentityUser {UserName = "bob"};
+			var user = new MongoIdentityUser {UserName = "bob"};
 			var manager = GetUserManager();
 			await manager.CreateAsync(user);
 			await manager.SetTwoFactorEnabledAsync(user, true);

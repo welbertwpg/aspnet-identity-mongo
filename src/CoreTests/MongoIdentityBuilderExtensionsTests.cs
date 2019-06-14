@@ -1,12 +1,13 @@
 ﻿namespace CoreTests
 {
 	using Microsoft.AspNetCore.Identity;
-	using Microsoft.AspNetCore.Identity.MongoDB;
+	using MongoDB.Identity;
 	using Microsoft.Extensions.DependencyInjection;
 	using NUnit.Framework;
+    using static NUnit.StaticExpect.Expectations;
 
-	[TestFixture]
-	public class MongoIdentityBuilderExtensionsTests : AssertionHelper
+    [TestFixture]
+	public class MongoIdentityBuilderExtensionsTests
 	{
 		private const string FakeConnectionStringWithDatabase = "mongodb://fakehost:27017/database";
 
@@ -19,24 +20,24 @@
 			services.AddLogging();
 
 			var provider = services.BuildServiceProvider();
-			var resolvedUserStore = provider.GetService<IUserStore<IdentityUser>>();
+			var resolvedUserStore = provider.GetService<IUserStore<MongoIdentityUser>>();
 			Expect(resolvedUserStore, Is.Not.Null, "User store did not resolve");
 
-			var resolvedRoleStore = provider.GetService<IRoleStore<IdentityRole>>();
+			var resolvedRoleStore = provider.GetService<IRoleStore<MongoIdentityRole>>();
 			Expect(resolvedRoleStore, Is.Not.Null, "Role store did not resolve");
 
-			var resolvedUserManager = provider.GetService<UserManager<IdentityUser>>();
+			var resolvedUserManager = provider.GetService<UserManager<MongoIdentityUser>>();
 			Expect(resolvedUserManager, Is.Not.Null, "User manager did not resolve");
 
-			var resolvedRoleManager = provider.GetService<RoleManager<IdentityRole>>();
+			var resolvedRoleManager = provider.GetService<RoleManager<MongoIdentityRole>>();
 			Expect(resolvedRoleManager, Is.Not.Null, "Role manager did not resolve");
 		}
 
-		protected class CustomUser : IdentityUser
+		protected class CustomUser : MongoIdentityUser
 		{
 		}
 
-		protected class CustomRole : IdentityRole
+		protected class CustomRole : MongoIdentityRole
 		{
 		}
 
@@ -69,18 +70,18 @@
 			var connectionStringWithoutDatabase = "mongodb://fakehost";
 
 			TestDelegate addMongoStores = () => new ServiceCollection()
-				.AddIdentity<IdentityUser, IdentityRole>()
-				.RegisterMongoStores<IdentityUser, IdentityRole>(connectionStringWithoutDatabase);
+				.AddIdentity<MongoIdentityUser, MongoIdentityRole>()
+				.RegisterMongoStores<MongoIdentityUser, MongoIdentityRole>(connectionStringWithoutDatabase);
 
 			Expect(addMongoStores, Throws.Exception
 				.With.Message.Contains("Your connection string must contain a database name"));
 		}
 
-		protected class WrongUser : IdentityUser
+		protected class WrongUser : MongoIdentityUser
 		{
 		}
 
-		protected class WrongRole : IdentityRole
+		protected class WrongRole : MongoIdentityRole
 		{
 		}
 
@@ -88,17 +89,17 @@
 		public void AddMongoStores_MismatchedTypes_ThrowsWarningToHelpUsers()
 		{
 			Expect(() => new ServiceCollection()
-					.AddIdentity<IdentityUser, IdentityRole>()
-					.RegisterMongoStores<WrongUser, IdentityRole>(FakeConnectionStringWithDatabase),
+					.AddIdentity<MongoIdentityUser, MongoIdentityRole>()
+					.RegisterMongoStores<WrongUser, MongoIdentityRole>(FakeConnectionStringWithDatabase),
 				Throws.Exception.With.Message
-					.EqualTo("User type passed to RegisterMongoStores must match user type passed to AddIdentity. You passed Microsoft.AspNetCore.Identity.MongoDB.IdentityUser to AddIdentity and CoreTests.MongoIdentityBuilderExtensionsTests+WrongUser to RegisterMongoStores, these do not match.")
+					.EqualTo("User type passed to RegisterMongoStores must match user type passed to AddIdentity. You passed MongoDB.Identity.MongoIdentityUser to AddIdentity and CoreTests.MongoIdentityBuilderExtensionsTests+WrongUser to RegisterMongoStores, these do not match.")
 			);
 
 			Expect(() => new ServiceCollection()
-					.AddIdentity<IdentityUser, IdentityRole>()
-					.RegisterMongoStores<IdentityUser, WrongRole>(FakeConnectionStringWithDatabase),
+					.AddIdentity<MongoIdentityUser, MongoIdentityRole>()
+					.RegisterMongoStores<MongoIdentityUser, WrongRole>(FakeConnectionStringWithDatabase),
 				Throws.Exception.With.Message
-					.EqualTo("Role type passed to RegisterMongoStores must match role type passed to AddIdentity. You passed Microsoft.AspNetCore.Identity.MongoDB.IdentityRole to AddIdentity and CoreTests.MongoIdentityBuilderExtensionsTests+WrongRole to RegisterMongoStores, these do not match.")
+					.EqualTo("Role type passed to RegisterMongoStores must match role type passed to AddIdentity. You passed MongoDB.Identity.MongoIdentityRole to AddIdentity and CoreTests.MongoIdentityBuilderExtensionsTests+WrongRole to RegisterMongoStores, these do not match.")
 			);
 		}
 	}

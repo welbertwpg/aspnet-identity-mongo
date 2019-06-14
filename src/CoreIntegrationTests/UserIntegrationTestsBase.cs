@@ -1,18 +1,17 @@
 ﻿namespace IntegrationTests
 {
 	using System;
-	using Microsoft.AspNetCore.Builder;
 	using Microsoft.AspNetCore.Identity;
-	using Microsoft.AspNetCore.Identity.MongoDB;
+	using MongoDB.Identity;
 	using Microsoft.Extensions.DependencyInjection;
 	using MongoDB.Driver;
 	using NUnit.Framework;
 
-	public class UserIntegrationTestsBase : AssertionHelper
+    public class UserIntegrationTestsBase
 	{
-		protected MongoDatabase Database;
-		protected MongoCollection<IdentityUser> Users;
-		protected MongoCollection<IdentityRole> Roles;
+		protected IMongoDatabase Database;
+		protected IMongoCollection<MongoIdentityUser> Users;
+		protected IMongoCollection<MongoIdentityRole> Roles;
 
 		// note: for now we'll have interfaces to both the new and old apis for MongoDB, that way we don't have to update all the tests at once and risk introducing bugs
 		protected IMongoDatabase DatabaseNewApi;
@@ -25,28 +24,27 @@
 		{
 			var client = new MongoClient(_TestingConnectionString);
 
-			// todo move away from GetServer which could be deprecated at some point
-			Database = client.GetServer().GetDatabase(IdentityTesting);
-			Users = Database.GetCollection<IdentityUser>("users");
-			Roles = Database.GetCollection<IdentityRole>("roles");
+			Database = client.GetDatabase(IdentityTesting);
+			Users = Database.GetCollection<MongoIdentityUser>("users");
+			Roles = Database.GetCollection<MongoIdentityRole>("roles");
 
 			DatabaseNewApi = client.GetDatabase(IdentityTesting);
 
 			Database.DropCollection("users");
 			Database.DropCollection("roles");
 
-			ServiceProvider = CreateServiceProvider<IdentityUser, IdentityRole>();
+			ServiceProvider = CreateServiceProvider<MongoIdentityUser, MongoIdentityRole>();
 		}
 
-		protected UserManager<IdentityUser> GetUserManager()
-			=> ServiceProvider.GetService<UserManager<IdentityUser>>();
+		protected UserManager<MongoIdentityUser> GetUserManager()
+			=> ServiceProvider.GetService<UserManager<MongoIdentityUser>>();
 
-		protected RoleManager<IdentityRole> GetRoleManager()
-			=> ServiceProvider.GetService<RoleManager<IdentityRole>>();
+		protected RoleManager<MongoIdentityRole> GetRoleManager()
+			=> ServiceProvider.GetService<RoleManager<MongoIdentityRole>>();
 
 		protected IServiceProvider CreateServiceProvider<TUser, TRole>(Action<IdentityOptions> optionsProvider = null)
-			where TUser : IdentityUser
-			where TRole : IdentityRole
+			where TUser : MongoIdentityUser
+			where TRole : MongoIdentityRole
 		{
 			var services = new ServiceCollection();
 			optionsProvider = optionsProvider ?? (options => { });

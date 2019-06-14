@@ -1,21 +1,22 @@
-﻿namespace Microsoft.AspNetCore.Identity.MongoDB
+﻿namespace MongoDB.Identity
 {
 	using System;
 	using System.Collections.Generic;
 	using System.Linq;
 	using System.Security.Claims;
-	using global::MongoDB.Bson;
-	using global::MongoDB.Bson.Serialization.Attributes;
+	using MongoDB.Bson;
+	using MongoDB.Bson.Serialization.Attributes;
+    using Microsoft.AspNetCore.Identity;
 
-	public class IdentityUser
+    public class MongoIdentityUser
 	{
-		public IdentityUser()
+		public MongoIdentityUser()
 		{
 			Id = ObjectId.GenerateNewId().ToString();
 			Roles = new List<string>();
-			Logins = new List<IdentityUserLogin>();
-			Claims = new List<IdentityUserClaim>();
-			Tokens = new List<IdentityUserToken>();
+			Logins = new List<MongoIdentityUserLogin>();
+			Claims = new List<MongoIdentityUserClaim>();
+			Tokens = new List<MongoIdentityUserToken>();
 		}
 
 		[BsonRepresentation(BsonType.ObjectId)]
@@ -66,11 +67,11 @@
 		public virtual string PasswordHash { get; set; }
 
 		[BsonIgnoreIfNull]
-		public virtual List<IdentityUserLogin> Logins { get; set; }
+		public virtual List<MongoIdentityUserLogin> Logins { get; set; }
 
 		public virtual void AddLogin(UserLoginInfo login)
 		{
-			Logins.Add(new IdentityUserLogin(login));
+			Logins.Add(new MongoIdentityUserLogin(login));
 		}
 
 		public virtual void RemoveLogin(string loginProvider, string providerKey)
@@ -84,11 +85,11 @@
 		}
 
 		[BsonIgnoreIfNull]
-		public virtual List<IdentityUserClaim> Claims { get; set; }
+		public virtual List<MongoIdentityUserClaim> Claims { get; set; }
 
 		public virtual void AddClaim(Claim claim)
 		{
-			Claims.Add(new IdentityUserClaim(claim));
+			Claims.Add(new MongoIdentityUserClaim(claim));
 		}
 
 		public virtual void RemoveClaim(Claim claim)
@@ -110,9 +111,9 @@
 		}
 
 		[BsonIgnoreIfNull]
-		public virtual List<IdentityUserToken> Tokens { get; set; }
+		public virtual List<MongoIdentityUserToken> Tokens { get; set; }
 
-		private IdentityUserToken GetToken(string loginProider, string name)
+		private MongoIdentityUserToken GetToken(string loginProider, string name)
 			=> Tokens
 				.FirstOrDefault(t => t.LoginProvider == loginProider && t.Name == name);
 
@@ -125,7 +126,7 @@
 				return;
 			}
 
-			Tokens.Add(new IdentityUserToken
+			Tokens.Add(new MongoIdentityUserToken
 			{
 				LoginProvider = loginProider,
 				Name = name,

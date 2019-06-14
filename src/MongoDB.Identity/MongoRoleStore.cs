@@ -2,27 +2,28 @@
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 // I'm using async methods to leverage implicit Task wrapping of results from expression bodied functions.
 
-namespace Microsoft.AspNetCore.Identity.MongoDB
+namespace MongoDB.Identity
 {
 	using System.Linq;
 	using System.Threading;
 	using System.Threading.Tasks;
-	using global::MongoDB.Driver;
+	using MongoDB.Driver;
+    using Microsoft.AspNetCore.Identity;
 
-	/// <summary>
-	///     Note: Deleting and updating do not modify the roles stored on a user document. If you desire this dynamic
-	///     capability, override the appropriate operations on RoleStore as desired for your application. For example you could
-	///     perform a document modification on the users collection before a delete or a rename.
-	///     When passing a cancellation token, it will only be used if the operation requires a database interaction.
-	/// </summary>
-	/// <typeparam name="TRole">Needs to extend the provided IdentityRole type.</typeparam>
-	public class RoleStore<TRole> : IQueryableRoleStore<TRole>
+    /// <summary>
+    ///     Note: Deleting and updating do not modify the roles stored on a user document. If you desire this dynamic
+    ///     capability, override the appropriate operations on RoleStore as desired for your application. For example you could
+    ///     perform a document modification on the users collection before a delete or a rename.
+    ///     When passing a cancellation token, it will only be used if the operation requires a database interaction.
+    /// </summary>
+    /// <typeparam name="TRole">Needs to extend the provided IdentityRole type.</typeparam>
+    public class MongoRoleStore<TRole> : IQueryableRoleStore<TRole>
 		// todo IRoleClaimStore<TRole>
-		where TRole : IdentityRole
+		where TRole : MongoIdentityRole
 	{
 		private readonly IMongoCollection<TRole> _Roles;
 
-		public RoleStore(IMongoCollection<TRole> roles)
+		public MongoRoleStore(IMongoCollection<TRole> roles)
 		{
 			_Roles = roles;
 		}

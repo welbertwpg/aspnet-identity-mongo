@@ -3,17 +3,19 @@
 	using System.Linq;
 	using System.Threading.Tasks;
 	using Microsoft.AspNetCore.Identity;
-	using Microsoft.AspNetCore.Identity.MongoDB;
+	using MongoDB.Identity;
 	using Microsoft.Extensions.DependencyInjection;
 	using NUnit.Framework;
+    using MongoDB.Driver;
+    using static NUnit.StaticExpect.Expectations;
 
-	[TestFixture]
+    [TestFixture]
 	public class EnsureWeCanExtendIdentityRoleTests : UserIntegrationTestsBase
 	{
 		private RoleManager<ExtendedIdentityRole> _Manager;
 		private ExtendedIdentityRole _Role;
 
-		public class ExtendedIdentityRole : IdentityRole
+		public class ExtendedIdentityRole : MongoIdentityRole
 		{
 			public string ExtendedField { get; set; }
 		}
@@ -21,7 +23,7 @@
 		[SetUp]
 		public void BeforeEachTestAfterBase()
 		{
-			_Manager = CreateServiceProvider<IdentityUser, ExtendedIdentityRole>()
+			_Manager = CreateServiceProvider<MongoIdentityUser, ExtendedIdentityRole>()
 				.GetService<RoleManager<ExtendedIdentityRole>>();
 			_Role = new ExtendedIdentityRole
 			{
@@ -36,7 +38,7 @@
 
 			await _Manager.CreateAsync(_Role);
 
-			var savedRole = Roles.FindAllAs<ExtendedIdentityRole>().Single();
+			var savedRole = Roles.FindSync<ExtendedIdentityRole>(FilterDefinition<MongoIdentityRole>.Empty).Single();
 			Expect(savedRole.ExtendedField, Is.EqualTo("extendedField"));
 		}
 

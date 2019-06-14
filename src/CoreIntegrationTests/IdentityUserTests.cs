@@ -1,20 +1,23 @@
 ﻿namespace IntegrationTests
 {
-	using Microsoft.AspNetCore.Identity.MongoDB;
+	using MongoDB.Identity;
 	using MongoDB.Bson;
 	using NUnit.Framework;
 	using Tests;
+    using static NUnit.StaticExpect.Expectations;
 
-	[TestFixture]
+    [TestFixture]
 	public class IdentityUserTests : UserIntegrationTestsBase
 	{
 		[Test]
 		public void Insert_NoId_SetsId()
 		{
-			var user = new IdentityUser();
-			user.Id = null;
+            var user = new MongoIdentityUser
+            {
+                Id = null
+            };
 
-			Users.Insert(user);
+            Users.InsertOne(user);
 
 			Expect(user.Id, Is.Not.Null);
 			var parsed = user.Id.SafeParseObjectId();

@@ -1,15 +1,17 @@
-﻿namespace Microsoft.AspNetCore.Identity.MongoDB
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace MongoDB.Identity
 {
-	public class IdentityUserLogin
+	public class MongoIdentityUserLogin
 	{
-		public IdentityUserLogin(string loginProvider, string providerKey, string providerDisplayName)
+		public MongoIdentityUserLogin(string loginProvider, string providerKey, string providerDisplayName)
 		{
 			LoginProvider = loginProvider;
 			ProviderDisplayName = providerDisplayName;
 			ProviderKey = providerKey;
 		}
 
-		public IdentityUserLogin(UserLoginInfo login)
+		public MongoIdentityUserLogin(UserLoginInfo login)
 		{
 			LoginProvider = login.LoginProvider;
 			ProviderDisplayName = login.ProviderDisplayName;

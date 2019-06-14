@@ -1,16 +1,16 @@
-﻿namespace Microsoft.AspNetCore.Identity.MongoDB
+﻿namespace MongoDB.Identity
 {
-	using global::MongoDB.Bson;
-	using global::MongoDB.Bson.Serialization.Attributes;
+	using MongoDB.Bson;
+	using MongoDB.Bson.Serialization.Attributes;
 
-	public class IdentityRole
+	public class MongoIdentityRole
 	{
-		public IdentityRole()
+		public MongoIdentityRole()
 		{
 			Id = ObjectId.GenerateNewId().ToString();
 		}
 
-		public IdentityRole(string roleName) : this()
+		public MongoIdentityRole(string roleName) : this()
 		{
 			Name = roleName;
 		}
