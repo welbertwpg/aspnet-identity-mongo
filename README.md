@@ -1,58 +1,28 @@
-AspNet.Identity.Mongo
-=====================
+﻿## MongoDB.Identity
 
-A mongodb provider for the new ASP.NET Identity framework. My aim is to ensure this project is well tested and configurable.
+This is an updated version of the [MongoDB provider](https://github.com/g0t4/aspnet-identity-mongo) for the ASP.NET Core Identity framework made by [Wes Higbee](https://github.com/g0t4)
+
+The core classes were renamed, there's no reason to conflict them with the original classes from Microsoft.AspNetCore.Identity.
 
 ## Usage
 
-	var client = new MongoClient("mongodb://localhost:27017");
-	var database = client.GetDatabase("mydb");
-	var users = database.GetCollection<IdentityUser>("users");
+- Reference this package in your .csproj: MongoDB.Identity
+- Then, in ConfigureServices--or wherever you are registering services--include the following to register both the Identity services and MongoDB stores:
 
-	var store = new UserStore<IdentityUser>(users);
-	var manager = new UserManager<IdentityUser>(store);
+```csharp
+services.AddIdentityWithMongoStores("mongodb://localhost/myDB");
+```
 
-	// if you want roles too:
-	var roles = database.GetCollection<IdentityRole>("roles");
-	var roleStore = new RoleStore<IdentityRole>(roles);
+- If you want to customize what is registered, refer to the tests for further options (CoreTests/MongoIdentityBuilderExtensionsTests.cs)
+- Remember with the Identity framework, the whole point is that both a `UserManager` and `RoleManager` are provided for you to use, here's how you can resolve instances manually. Of course, constructor injection is also available.
 
-	// at some point in application startup it would be good to ensure unique indexes on user and role names exist:
+```csharp
+var userManager = provider.GetService<UserManager<IdentityUser>>();
+var roleManager = provider.GetService<RoleManager<IdentityRole>>();
+```
 
-	IndexChecks.EnsureUniqueIndexOnUserName(users);
-	IndexChecks.EnsureUniqueIndexOnEmail(users);
+## Updates
 
-	IndexChecks.EnsureUniqueIndexOnRoleName(roles);
-
-OR
-
-a sample [aspnet-identity-mongo-sample](https://github.com/g0t4/aspnet-identity-mongo-sample) based on [Microsoft ASP.NET Identity Samples](http://www.nuget.org/packages/Microsoft.AspNet.Identity.Samples).
-
-## Installation
-
-via nuget:
-
-	Install-Package AspNet.Identity.MongoDB
-
-## Building and Testing
-
-I'm using the albacore project with rake.
-
-To build:
-
-	rake msbuild
-	
-To test:
-
-	rake tests
-	rake integration_tests
-
-To package:
-	
-	rake package
-
-## Documentation
-
-I'm writing about my design decisions on my blog:
-
-- [Building a mongodb provider for the new ASP.NET Identity framework - Part 1](http://devblog.weshigbee.name/posts/building-a-mongodb-provider-for-the-new-asp.net-identity-framework-part-1)
-- [Building a mongodb provider for the new ASP.NET Identity framework - Part 2 RoleStore And Sample](http://devblog.weshigbee.name/posts/building-a-mongodb-provider-for-the-new-asp.net-identity-framework-part-2-rolestore-and-sample)
+- NetStandard 2.0
+- Microsoft.AspNetCore.Identity v2.2.0
+- MongoDB.Driver v2.8.1
