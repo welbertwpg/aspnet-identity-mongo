@@ -90,11 +90,11 @@
 			var user = new MongoIdentityUser {UserName = "name"};
 			var manager = GetUserManager();
 			await manager.CreateAsync(user);
-			Expect(Users.Find(FilterDefinition<MongoIdentityUser>.Empty), Is.Not.Empty);
+			Expect(Users.Find(FilterDefinition<MongoIdentityUser>.Empty).ToList(), Is.Not.Empty);
 
 			await manager.DeleteAsync(user);
 
-			Expect(Users.Find(FilterDefinition<MongoIdentityUser>.Empty), Is.Empty);
+			Expect(Users.Find(FilterDefinition<MongoIdentityUser>.Empty).ToList(), Is.Empty);
 		}
 
 		[Test]

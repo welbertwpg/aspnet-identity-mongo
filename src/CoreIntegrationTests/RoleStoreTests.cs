@@ -61,11 +61,11 @@
 			var role = new MongoIdentityRole {Name = "name"};
 			var manager = GetRoleManager();
 			await manager.CreateAsync(role);
-			Expect(Roles.Find(FilterDefinition<MongoIdentityRole>.Empty), Is.Not.Empty);
+			Expect(Roles.Find(FilterDefinition<MongoIdentityRole>.Empty).ToList(), Is.Not.Empty);
 
 			await manager.DeleteAsync(role);
 
-			Expect(Roles.Find(FilterDefinition<MongoIdentityRole>.Empty), Is.Empty);
+			Expect(Roles.Find(FilterDefinition<MongoIdentityRole>.Empty).ToList(), Is.Empty);
 		}
 
 		[Test]
